@@ -27,6 +27,13 @@ public class Robot extends IterativeRobot {
 	private static final String DEFAULT_AUTO = "Default";
 	private static final String CUSTOM_AUTO = "My Auto";
 	
+	private static final double AUTO_SPEED = 0.5;
+	private static final double AUTO_TIME = 3.0;
+	
+	private static final int MOTOR1_PORT = 0;
+	private static final int MOTOR2_PORT = 1;
+	private static final int JOYSTICK_PORT = 1;
+	
 	private String autoSelected;
 	private SendableChooser<String> chooser = new SendableChooser<>();
 	private PWMSpeedController speedController1 = null;
@@ -44,10 +51,10 @@ public class Robot extends IterativeRobot {
 		chooser.addDefault("Default Auto", DEFAULT_AUTO);
 		chooser.addObject("My Auto", CUSTOM_AUTO);
 		SmartDashboard.putData("Auto choices", chooser);
-		speedController1 = new Spark(0);
-		speedController2 = new Spark(1);
+		speedController1 = new Spark(MOTOR1_PORT);
+		speedController2 = new Spark(MOTOR2_PORT);
 		mainTimer = new Timer();
-		joystick = new Joystick(1);
+		joystick = new Joystick(JOYSTICK_PORT);
 		drive = new DifferentialDrive(speedController1, speedController2);
 	}
 
@@ -79,9 +86,9 @@ public class Robot extends IterativeRobot {
 		switch (autoSelected) {
 			case CUSTOM_AUTO:
 				// Put custom auto code here
-				if (mainTimer.get() > 3)
-					speedController.set(0);
-				else speedController.set(.5);
+				if (mainTimer.get() > AUTO_TIME)
+					drive.arcadeDrive(0, 0);
+				else drive.arcadeDrive(AUTO_SPEED, 0);
 				break;
 			case DEFAULT_AUTO:
 			default:
