@@ -10,6 +10,11 @@ package org.usfirst.frc.team3655.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.PWMSpeedController;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -19,20 +24,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
-	private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private SendableChooser<String> m_chooser = new SendableChooser<>();
-
+	private static final String DEFAULT_AUTO = "Default";
+	private static final String CUSTOM_AUTO = "My Auto";
+	
+	private String autoSelected;
+	private SendableChooser<String> chooser = new SendableChooser<>();
+	private PWMSpeedController speedController1 = null;
+	private PWMSpeedController speedController2 = null;
+	private Timer mainTimer = null;
+	private Joystick joystick = null;
+	private DifferentialDrive drive = null;
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+		chooser.addDefault("Default Auto", DEFAULT_AUTO);
+		chooser.addObject("My Auto", CUSTOM_AUTO);
+		SmartDashboard.putData("Auto choices", chooser);
+		speedController1 = new Spark(0);
+		speedController2 = new Spark(1);
+		mainTimer = new Timer();
+		joystick = new Joystick(1);
+		drive = new DifferentialDrive(speedController1, speedController2);
 	}
 
 	/**
@@ -48,10 +64,11 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
+		autoSelected = chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		System.out.println("Auto selected: " + autoSelected);
+		mainTimer.reset();
 	}
 
 	/**
@@ -59,11 +76,14 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
-			case kCustomAuto:
+		switch (autoSelected) {
+			case CUSTOM_AUTO:
 				// Put custom auto code here
+				if (mainTimer.get() > 3)
+					speedController.set(0);
+				else speedController.set(.5);
 				break;
-			case kDefaultAuto:
+			case DEFAULT_AUTO:
 			default:
 				// Put default auto code here
 				break;
@@ -75,6 +95,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		drive.arcadeDrive(joystick.getRawAxis(1), joystick.getRawAxis(0));
 	}
 
 	/**
