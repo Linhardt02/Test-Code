@@ -28,6 +28,7 @@ public class Robot extends IterativeRobot {
 	private static final String DEFAULT_AUTO = "Default";
 	private static final String CUSTOM_AUTO = "My Auto";
 	
+	//If you want  to edit these values you just have to change the numbers at the end and you wont have to actually find it in the code.
 	//This number is the speed of the motor during the autonomous period
 	private static final double AUTO_SPEED = 0.5;
 	//This number is the time it is active during the autonomous period (In seconds)
