@@ -4,9 +4,10 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
+//Make sure you change this to your team number.
 package org.usfirst.frc.team3655.robot;
 
+//These are all of the frc imports you can find them online.
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,19 +28,29 @@ public class Robot extends IterativeRobot {
 	private static final String DEFAULT_AUTO = "Default";
 	private static final String CUSTOM_AUTO = "My Auto";
 	
+	//This number is the speed of the motor during the autonomous period
 	private static final double AUTO_SPEED = 0.5;
+	//This number is the time it is active during the autonomous period (In seconds)
 	private static final double AUTO_TIME = 3.0;
+	//This number multiplies the joystick input by this number.
+	private static final double TELEOP_SPEED = 0.5;
 	
+	//These are the ports for your motors and the joystick port should be set to the joystick that you use to move
 	private static final int MOTOR1_PORT = 0;
 	private static final int MOTOR2_PORT = 1;
-	private static final int JOYSTICK_PORT = 1;
+	private static final int JOYSTICK_PORT = 0;
 	
+	//Here we are setting all of the speed controllers and a variable for if auto is selected.
 	private String autoSelected;
 	private SendableChooser<String> chooser = new SendableChooser<>();
 	private PWMSpeedController speedController1 = null;
 	private PWMSpeedController speedController2 = null;
+	// Here we make a timer that we use in the autonomous.
 	private Timer mainTimer = null;
+	//Here we set the joystick so we can use it to control our speed controllers.
 	private Joystick joystick = null;
+	//Here we call 
+	
 	private DifferentialDrive drive = null;
 	
 	/**
@@ -102,7 +113,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		drive.arcadeDrive(joystick.getRawAxis(1) * .5, joystick.getRawAxis(0) * .5);
+		drive.arcadeDrive(joystick.getRawAxis(1) * TELEOP_SPEED, joystick.getRawAxis(0) * TELEOP_SPEED);
 	}
 
 	/**
