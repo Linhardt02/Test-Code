@@ -102,7 +102,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		drive.arcadeDrive(joystick.getRawAxis(1), joystick.getRawAxis(0));
+		drive.arcadeDrive(joystick.getRawAxis(1) * .5, joystick.getRawAxis(0) * .5);
 	}
 
 	/**
