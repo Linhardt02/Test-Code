@@ -50,8 +50,7 @@ public class Robot extends IterativeRobot {
 	private Timer mainTimer = null;
 	//Here we set the joystick so we can use it to control our speed controllers.
 	private Joystick joystick = null;
-	//Here we call 
-	
+	//Here we call the differential drive function from first's api
 	private DifferentialDrive drive = null;
 	
 	/**
