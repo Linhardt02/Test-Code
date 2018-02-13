@@ -4,16 +4,17 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-//Make sure you change this to your team number.
-package org.usfirst.frc.team3655.robot;
 
-//These are all of the frc imports you can find them online.
+package org.usfirst.frc.team7144.robot;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -25,48 +26,72 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * project.
  */
 public class Robot extends IterativeRobot {
+
+//Setting up auto, position sensitive
 	private static final String DEFAULT_AUTO = "Default";
 	private static final String CUSTOM_AUTO = "My Auto";
-	
+	private static final String C_AUTO = "Center Setup";
+	private static final String R_AUTO = "Right Setup";
+	private static final String L_AUTO = "Left Setup";
+
 	//If you want  to edit these values you just have to change the numbers at the end and you wont have to actually find it in the code.
 	//This number is the speed of the motor during the autonomous period
-	private static final double AUTO_SPEED = 0.5;
+	private static final double AUTO_SPEED = 0.6;
 	//This number is the time it is active during the autonomous period (In seconds)
-	private static final double AUTO_TIME = 3.0;
+	private static final double AUTO_TIME = 15.0;
+	private static final double AUTO_DRIVETIME = 5.0;
 	//This number multiplies the joystick input by this number.
-	private static final double TELEOP_SPEED = 0.5;
-	
+	private static final double TELEOP_SPEED = 0.6;
 	//These are the ports for your motors and the joystick port should be set to the joystick that you use to move
 	private static final int MOTOR1_PORT = 0;
 	private static final int MOTOR2_PORT = 1;
 	private static final int JOYSTICK_PORT = 0;
-	
-	//Here we are setting all of the speed controllers and a variable for if auto is selected.
-	private String autoSelected;
-	private SendableChooser<String> chooser = new SendableChooser<>();
+
+	// Basic Setup
 	private PWMSpeedController speedController1 = null;
 	private PWMSpeedController speedController2 = null;
-	// Here we make a timer that we use in the autonomous.
 	private Timer mainTimer = null;
-	//Here we set the joystick so we can use it to control our speed controllers.
 	private Joystick joystick = null;
-	//Here we call the differential drive function from first's api
+	private Joystick joystick2;
 	private DifferentialDrive drive = null;
+	private String gameData;
 	
+	//Setup for motors
+	private PWMSpeedController speedController3 = null;
+	private PWMSpeedController speedController4 = null;
+	private static final int MOTOR3_PORT = 2;
+	private static final int MOTOR4_PORT = 3;	
+	private static final int JOYSTICK2_PORT = 1;
+
+	//maybe how the auto is selected?
+	private String autoSelected;
+	private SendableChooser<String> chooser = new SendableChooser<>();
+
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
-		chooser.addDefault("Default Auto", DEFAULT_AUTO);
-		chooser.addObject("My Auto", CUSTOM_AUTO);
+// Setup Position
+		chooser.addDefault("Center Setup", C_AUTO);
+		chooser.addObject("Right Setup", R_AUTO);
+		chooser.addObject("Left Setup", L_AUTO);
+//		chooser.addObject("My Auto", CUSTOM_AUTO);
 		SmartDashboard.putData("Auto choices", chooser);
+
 		speedController1 = new Spark(MOTOR1_PORT);
 		speedController2 = new Spark(MOTOR2_PORT);
 		mainTimer = new Timer();
 		joystick = new Joystick(JOYSTICK_PORT);
 		drive = new DifferentialDrive(speedController1, speedController2);
+// Motors
+		speedController3 = new Spark(MOTOR3_PORT);
+		speedController4 = new Spark(MOTOR4_PORT);	
+		joystick2 = new Joystick(JOYSTICK2_PORT);	
+	
+		//setup position buttons
+		Scheduler.getInstance().run();
 	}
 
 	/**
@@ -75,7 +100,6 @@ public class Robot extends IterativeRobot {
 	 * chooser code works with the Java SmartDashboard. If you prefer the
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
 	 * getString line to get the auto name from the text box below the Gyro
-	 *
 	 * <p>You can add additional auto modes by adding additional comparisons to
 	 * the switch structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
@@ -83,27 +107,73 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		autoSelected = chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
+
+		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		mainTimer.reset();
 	}
 
 	/**
-	 * This function is called periodically during autonomous.
+	 * This function is called periodically during autonomous. This is your running for loop
 	 */
 	@Override
 	public void autonomousPeriodic() {
 		switch (autoSelected) {
-			case CUSTOM_AUTO:
+		Scheduler.getInstance().run();
+// ALL the different Auto options are listed below			
+			case C_AUTO:
+				if(mainTimer.get() < AUTO_DRIVETIME)
+				{
+					drive.arcadeDrive(AUTO_SPEED, 0.0);
+				}
+                drive.arcadeDrive(0.0, 0.0);
+                break;
+                
+			case R_AUTO:
+				if(gameData.charAt(0) == 'L')
+				{
+					if(mainTimer.get() < AUTO_DRIVETIME)
+					{
+						drive.arcadeDrive(AUTO_SPEED, 0.0);
+					}
+	                drive.arcadeDrive(0.0, 0.0);
+				}
+				if(gameData.charAt(0)=='R')
+				{	
+					if(mainTimer.get() < AUTO_DRIVETIME)
+					{
+						drive.arcadeDrive(AUTO_SPEED, 0.2);
+					}
+	                drive.arcadeDrive(0.0, 0.0);			
+				}		
+                break;				
+                
+			case L_AUTO:
 				// Put custom auto code here
-				if (mainTimer.get() > AUTO_TIME)
-					drive.arcadeDrive(0, 0);
-				else drive.arcadeDrive(AUTO_SPEED, 0);
-				break;
+				if(gameData.charAt(0) == 'L')
+				{
+					if(mainTimer.get() < AUTO_DRIVETIME)
+					{
+						drive.arcadeDrive(AUTO_SPEED, 0.0);
+					}
+	                drive.arcadeDrive(0.0, 0.0);
+				}
+				if(gameData.charAt(0)=='R')
+				{	
+					if(mainTimer.get() < AUTO_DRIVETIME)
+					{
+						drive.arcadeDrive(AUTO_SPEED, 0.1);
+					}
+	                drive.arcadeDrive(0.0, 0.0);			
+				}								
+                break;
+
 			case DEFAULT_AUTO:
 			default:
-				// Put default auto code here
+				if(mainTimer.get() < AUTO_DRIVETIME)
+				{
+					drive.arcadeDrive(AUTO_SPEED, 0.0);
+				}
+                drive.arcadeDrive(0.0, 0.0);
 				break;
 		}
 	}
@@ -113,7 +183,10 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		drive.arcadeDrive(joystick.getRawAxis(1) * TELEOP_SPEED, joystick.getRawAxis(0) * TELEOP_SPEED);
+		drive.arcadeDrive(joystick.getRawAxis(1) * TELEOP_SPEED, joystick.getRawAxis(0) * TELEOP_SPEED );
+	//motors
+		speedController3.set(1.0*joystick2.getY());
+		speedController4.set(-1.0*joystick2.getY());	
 	}
 
 	/**
